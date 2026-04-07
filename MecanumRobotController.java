@@ -17,8 +17,8 @@ public class MecanumRobotController extends RobotController{
     MatrixF iKmat; //inverse kinematics matrix
 
 
-    MecanumRobotController(HardwareMap hardwareMap, String[] motorNames, boolean[] _reversedList, PIDFCoefficients[] _PIDList, double _dt, double[] _dimensionsLWR) {
-        super(4, hardwareMap, motorNames, _reversedList, _PIDList, new int[]{250, 250, 250, 250}, _dt); //dont need counts per rev
+    public MecanumRobotController(HardwareMap hardwareMap, String[] motorNames, boolean[] _reversedList, PIDFCoefficients[] _PIDList, double _dt, double[] _dimensionsLWR, Localizer _localizer) {
+        super(4, hardwareMap, motorNames, _reversedList, _PIDList, new int[]{250, 250, 250, 250}, _dt, _localizer); //dont need counts per rev
 
         L = (float)_dimensionsLWR[0];
         W = (float)_dimensionsLWR[1];

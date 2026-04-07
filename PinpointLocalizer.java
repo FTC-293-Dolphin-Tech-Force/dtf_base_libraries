@@ -12,9 +12,9 @@ public class PinpointLocalizer extends Localizer{
     GoBildaPinpointDriver odo;
     //double previousHeading; //current heading from 0 to 2pi
     //double totalHeading;
-    VectorF pinpointPose;
+    VectorF pinpointPose = new VectorF(0, 0, 0);
 
-    PinpointLocalizer(HardwareMap hardwareMap, VectorF _initPose, VectorF _initVel, double _xOff, double _yOff, GoBildaPinpointDriver.GoBildaOdometryPods _podType, GoBildaPinpointDriver.EncoderDirection[] _directionList){
+    public PinpointLocalizer(HardwareMap hardwareMap, VectorF _initPose, VectorF _initVel, double _xOff, double _yOff, GoBildaPinpointDriver.GoBildaOdometryPods _podType, GoBildaPinpointDriver.EncoderDirection[] _directionList){
 
         super(_initPose, _initVel);
         odo = hardwareMap.get(GoBildaPinpointDriver.class,"pinpoint");
@@ -25,7 +25,7 @@ public class PinpointLocalizer extends Localizer{
 
     }
 
-    void updateTelemetry(){
+    public void updateTelemetry(){
 
         telemetry.addData("Pinpoint Status", odo.getDeviceStatus());
         telemetry.addData("frequency", odo.getFrequency());
@@ -36,12 +36,13 @@ public class PinpointLocalizer extends Localizer{
 
     }
 
-    void updatePos(){
+    public void updatePos(){
 
         odo.update();
         pinpointPose.put(0, (float) odo.getPosX());
         pinpointPose.put(1, (float) odo.getPosY());
         pinpointPose.put(2, (float) odo.getHeading());
+        pose = pinpointPose;
 
     }
 

@@ -31,8 +31,10 @@ public class RobotController {
     YawPitchRollAngles angles;
     double heading;
 
+    Localizer localizer;
 
-    RobotController(int _n, HardwareMap hardwareMap, String[] hardwareNames, boolean[] _reversedList, PIDFCoefficients[] _PIDList, int[] _countsPerRevList, double _dt){
+
+    RobotController(int _n, HardwareMap hardwareMap, String[] hardwareNames, boolean[] _reversedList, PIDFCoefficients[] _PIDList, int[] _countsPerRevList, double _dt, Localizer _localizer){
 
         n = _n;
         dt = _dt;
@@ -58,6 +60,8 @@ public class RobotController {
 
         angles = imu.getRobotYawPitchRollAngles();
         heading = angles.getYaw(AngleUnit.RADIANS);
+
+        localizer = _localizer;
 
     }
 
@@ -91,6 +95,24 @@ public class RobotController {
 
     public VectorF rotate(VectorF velocities, double radians){ //inverse kinematics; vx, vy, ωz -> ω0, ω1, ω2, ω3
         return getRotationMat(radians).multiplied(velocities);
+    }
+
+    public DcMotorEx[] getMotorList(){
+
+        return motors;
+
+    }
+
+    public DcMotorEx getMotor(int index){
+
+        return motors[index];
+
+    }
+
+    public Localizer getLocalizer(){
+
+        return localizer;
+
     }
 
 }
