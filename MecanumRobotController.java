@@ -38,14 +38,24 @@ public class MecanumRobotController extends RobotController{
         return iKmat.multiplied(velocities);
     }
 
-    public void setTargetVelocity(VectorF velocities){
+    public void setTargetVelocity(VectorF velocity){
 
-        VectorF angularVels = iK(velocities);
+        VectorF angularVels = iK(velocity);
         for(int i = 0; i < 4; i++){
 
             motors[i].setVelocity(angularVels.get(i), AngleUnit.RADIANS);
 
         }
+
+    }
+
+    public double setTargetPosition(VectorF targetPose){ //this is super messed up; fix it later
+
+        localizer.updatePos();
+        VectorF displacement = targetPose.subtracted(localizer.getPose());
+        VectorF targetVel = displacement.multiplied((float) 0.1);
+        setTargetVelocity(targetVel);
+        return displacement.magnitude();
 
     }
 

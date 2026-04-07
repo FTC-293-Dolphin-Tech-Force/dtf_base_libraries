@@ -115,4 +115,12 @@ public class RobotController {
 
     }
 
+    public void setTargetVelocity(){
+
+    }
+
+    public void setTargetPosition(){
+
+    }
+
 }
