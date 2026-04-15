@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.matrices.GeneralMatrixF;
 import org.firstinspires.ftc.robotcore.external.matrices.MatrixF;
@@ -21,6 +22,8 @@ public class RobotController {
     int[] countsPerRevList;
     double dt;
 
+    ElapsedTime runtime;
+
     // Define the orientation of the Control Hub on the robot
     RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
             RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
@@ -34,7 +37,7 @@ public class RobotController {
     Localizer localizer;
 
 
-    RobotController(int _n, HardwareMap hardwareMap, String[] hardwareNames, boolean[] _reversedList, PIDFCoefficients[] _PIDList, int[] _countsPerRevList, double _dt, Localizer _localizer){
+    RobotController(int _n, HardwareMap hardwareMap, ElapsedTime _runtime, String[] hardwareNames, boolean[] _reversedList, PIDFCoefficients[] _PIDList, int[] _countsPerRevList, double _dt, Localizer _localizer){
 
         n = _n;
         dt = _dt;
@@ -43,6 +46,8 @@ public class RobotController {
         reversedList = new boolean[n];
         PIDList = new PIDFCoefficients[n];
         countsPerRevList = new int[n];
+
+        runtime = _runtime;
 
         for(int i = 0; i < n; i++) {
             motors[i] = hardwareMap.get(DcMotorEx.class, hardwareNames[i]);

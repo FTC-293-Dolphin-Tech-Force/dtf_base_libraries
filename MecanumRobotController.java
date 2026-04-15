@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.dtf_base_libraries;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.matrices.GeneralMatrixF;
 import org.firstinspires.ftc.robotcore.external.matrices.MatrixF;
@@ -16,9 +16,14 @@ public class MecanumRobotController extends RobotController{
     float[] iKmatValues;
     MatrixF iKmat; //inverse kinematics matrix
 
+    VectorF error = new VectorF(0, 0, 0), iError = new VectorF(0, 0, 0), dError = new VectorF(0, 0, 0);
+    ElapsedTime runtime;
+    double time = 0, lastTime = 0;
+    float kP = (float) 0.25, kI = (float) 0, kD = (float) 0;
 
-    public MecanumRobotController(HardwareMap hardwareMap, String[] motorNames, boolean[] _reversedList, PIDFCoefficients[] _PIDList, double _dt, double[] _dimensionsLWR, Localizer _localizer) {
-        super(4, hardwareMap, motorNames, _reversedList, _PIDList, new int[]{250, 250, 250, 250}, _dt, _localizer); //dont need counts per rev
+
+    public MecanumRobotController(HardwareMap hardwareMap, ElapsedTime _runtime, String[] motorNames, boolean[] _reversedList, PIDFCoefficients[] _PIDList, double _dt, double[] _dimensionsLWR, Localizer _localizer) {
+        super(4, hardwareMap, _runtime, motorNames, _reversedList, _PIDList, new int[]{250, 250, 250, 250}, _dt, _localizer); //dont need counts per rev
 
         L = (float)_dimensionsLWR[0];
         W = (float)_dimensionsLWR[1];
@@ -49,6 +54,7 @@ public class MecanumRobotController extends RobotController{
 
     }
 
+    /*
     public double setTargetPosition(VectorF targetPose){ //this is super messed up; fix it later
 
         localizer.updatePos();
@@ -57,6 +63,30 @@ public class MecanumRobotController extends RobotController{
         setTargetVelocity(targetVel);
         return displacement.magnitude();
 
+    }*/
+
+    public void setTargetPosition(VectorF targetPose, double currentTime){ //this is super messed up; fix it later
+
+        setTargetVelocity(PID(targetPose, currentTime));
+
     }
+
+    public VectorF PID(VectorF targetPose, double currentTime){
+
+        error = localizer.getPoseError(targetPose);
+        double dtime = currentTime - lastTime; // final minus initial
+        lastTime = currentTime;
+
+        dError = localizer.getVel().multiplied(-1); // technically it should be vel of targetPose minus robot vel, but we assume targetPose is const for now.
+        iError.add(error.multiplied((float) dtime));
+
+        VectorF P = error.multiplied(kP);
+        VectorF I = iError.multiplied(kI);
+        VectorF D = dError.multiplied(kD);
+
+        return P.added(I).added(D);
+
+    }
+
 
 }

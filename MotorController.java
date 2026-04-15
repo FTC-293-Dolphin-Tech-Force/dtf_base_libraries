@@ -63,7 +63,10 @@ public class MotorController {
     public double PID(){
         error = angularTarget - angularVel;
         double time = getTimeSeconds();
-        double dt = time-lastTime;
+
+        double dt = runtime.seconds() - lastTime; // final minus initial
+        lastTime = runtime.seconds();
+
         derivative = (error-lastError)/dt;
         integral += error*dt;
 
