@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 public class RobotController {
 
     int n;
-    DcMotorEx[] motors;
+    public DcMotorEx[] motors;
     boolean[] reversedList;
     PIDFCoefficients[] PIDList;
     int[] countsPerRevList;

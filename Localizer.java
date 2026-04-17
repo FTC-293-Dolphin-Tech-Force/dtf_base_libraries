@@ -66,6 +66,11 @@ public class Localizer {
         return pose;
     }
 
+    public float getHeading() {
+        updatePose();
+        return pose.get(2);
+    }
+
     public VectorF getVel() {
         updateVel();
         return vel;

@@ -67,9 +67,11 @@ public class MecanumRobotController extends RobotController{
 
     public void setTargetPosition(VectorF targetPose, double currentTime){ //this is super messed up; fix it later
 
-        setTargetVelocity(PID(targetPose, currentTime));
+        setTargetVelocity(rotate(PID(targetPose, currentTime), -localizer.getHeading()));
 
     }
+
+
 
     public VectorF PID(VectorF targetPose, double currentTime){
 
@@ -87,6 +89,10 @@ public class MecanumRobotController extends RobotController{
         return P.added(I).added(D);
 
     }
+
+    public void setkP(float value){kP = value;}
+    public void setkI(float value){kI = value;}
+    public void setkD(float value){kD = value;}
 
 
 }
