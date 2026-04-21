@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.matrices.MatrixF;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+@Deprecated
 public class MecanumRobotController extends RobotController{
 
     float L;
@@ -19,7 +20,7 @@ public class MecanumRobotController extends RobotController{
     VectorF error = new VectorF(0, 0, 0), iError = new VectorF(0, 0, 0), dError = new VectorF(0, 0, 0);
     ElapsedTime runtime;
     double time = 0, lastTime = 0;
-    float kP = (float) 0.25, kI = (float) 0, kD = (float) 0;
+    float kP = (float) 0.105, kI = (float) 0.0036, kD = (float) 0.037;
 
 
     public MecanumRobotController(HardwareMap hardwareMap, ElapsedTime _runtime, String[] motorNames, boolean[] _reversedList, PIDFCoefficients[] _PIDList, double _dt, double[] _dimensionsLWR, Localizer _localizer) {

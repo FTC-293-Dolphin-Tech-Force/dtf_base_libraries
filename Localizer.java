@@ -39,7 +39,12 @@ public class Localizer {
     public VectorF getPoseError(VectorF expectedPose){
 
         updatePose();
-        return expectedPose.subtracted(pose);
+        VectorF error = pose.subtracted(expectedPose);
+        float ht = expectedPose.get(2); //h target
+        float h = pose.get(2); //maybe just use getHeading for this and replace the first line
+        float hError = (float)(((h-Math.PI)%(2*Math.PI))+(Math.PI-ht));
+        error.put(2, hError);
+        return error;
 
     }
 
