@@ -19,7 +19,7 @@ public class MecanumRobotController2 extends RobotController{
     VectorF error = new VectorF(0, 0, 0), iError = new VectorF(0, 0, 0), dError = new VectorF(0, 0, 0);
     ElapsedTime runtime;
     double time = 0, lastTime = 0;
-    float kP = (float) 0.105, kI = (float) 0.0036, kD = (float) 0.037;
+    float kP = (float) 0.23, kI = (float) 0.0, kD = (float) 0.0; //P = 0.105 I = 0.0036 D = 0.037
     float[] kPmatValues = new float[]{
         kP, 0, 0,
         0, kP, 0,
@@ -93,6 +93,15 @@ public class MecanumRobotController2 extends RobotController{
 
 
 
+    public float getPoseErrorScalar(VectorF targetPose){
+
+        VectorF vectorError = localizer.getPoseError(targetPose);
+        float xErr = vectorError.get(0);
+        float yErr = vectorError.get(1);
+        float hErr = vectorError.get(2);
+        return (float) Math.sqrt((xErr*xErr)+(yErr*yErr)+(hErr*hErr)*(L*L+W*W));
+
+    }
     public VectorF PID(VectorF targetPose, double currentTime){
 
         error = localizer.getPoseError(targetPose);
@@ -102,11 +111,21 @@ public class MecanumRobotController2 extends RobotController{
         dError = localizer.getVel().multiplied(-1); // technically it should be vel of targetPose minus robot vel, but we assume targetPose is const for now.
         iError.add(error.multiplied((float) dtime));
 
+        if(Math.abs(error.get(0)) < 0.01){ // integral wipe
+            iError.put(0, 0);
+        }
+        if(Math.abs(error.get(1)) < 0.01){
+            iError.put(1, 0);
+        }
+        if(Math.abs(error.get(2))*Math.sqrt((L*L)+(W*W)) < 0.01){
+            iError.put(2, 0);
+        }
+
         VectorF P = kPmat.multiplied(error);
         VectorF I = kImat.multiplied(iError);
         VectorF D = kDmat.multiplied(dError);
 
-        return P.added(I).added(D); //idk if this is the right spot
+        return P.added(I).added(D).multiplied(-1); //idk if this is the right spot
 
     }
 
@@ -123,6 +142,20 @@ public class MecanumRobotController2 extends RobotController{
             kDmatValues[4*j] = value;
             kDmat = new GeneralMatrixF(3, 3, kDmatValues);
         }
+    }
+
+    public float getPIDconstant(int i, int j){ //i selects kP, kI, and kD (0-2) and j selects vx, vy, and vh (0-2)
+        float value;
+        if(i == 0){
+            value = kPmatValues[4*j];
+        }
+        else if(i == 1){
+            value = kImatValues[4*j];
+        }
+        else{
+            value = kDmatValues[4*j];
+        }
+        return value;
     }
 
 
