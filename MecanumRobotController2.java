@@ -19,7 +19,7 @@ public class MecanumRobotController2 extends RobotController{
     VectorF error = new VectorF(0, 0, 0), iError = new VectorF(0, 0, 0), dError = new VectorF(0, 0, 0);
     ElapsedTime runtime;
     double time = 0, lastTime = 0;
-    float kP = (float) 0.23, kI = (float) 0.0, kD = (float) 0.0; //P = 0.105 I = 0.0036 D = 0.037
+    float kP = (float) 0.60, kI = (float) 0.0, kD = (float) 0.12; //P = 0.105 I = 0.0036 D = 0.037
     float[] kPmatValues = new float[]{
         kP, 0, 0,
         0, kP, 0,
@@ -91,6 +91,20 @@ public class MecanumRobotController2 extends RobotController{
 
     }
 
+    public void setTargetState(VectorF targetPose, VectorF targetDerivative, double currentTime){ //this is super messed up; fix it later
+
+        setTargetVelocity(rotate(PID(targetPose, currentTime), -localizer.getHeading()));
+
+    }
+
+    public void followPath(Path path, double currentTime){
+
+        VectorF targetPose = new VectorF((float)path.getx(currentTime), (float)path.gety(currentTime), (float)path.geth(currentTime));
+        VectorF targetDerivative = new VectorF((float)path.getdx(currentTime), (float)path.getdy(currentTime), (float)path.getdh(currentTime));
+        setTargetState(targetPose, targetDerivative, currentTime);
+
+    }
+
 
 
     public float getPoseErrorScalar(VectorF targetPose){
@@ -102,30 +116,82 @@ public class MecanumRobotController2 extends RobotController{
         return (float) Math.sqrt((xErr*xErr)+(yErr*yErr)+(hErr*hErr)*(L*L+W*W));
 
     }
+
+    public float scaleErrorD(float error){
+
+        return (float) (1.0/(error*error + 1.0));
+
+    }
+
+    public MatrixF getScaledDMat(VectorF error){ //generates matrix based on errors to scale the D component of the PID controller and make sure D doesn't play a role until r is small.
+
+        float X = scaleErrorD(error.get(0));
+        float Y = scaleErrorD(error.get(1));
+        float H = scaleErrorD(error.get(2));
+
+        float[] scaledDValues = new float[]{
+                X, 0, 0,
+                0, Y, 0,
+                0, 0, H
+        };
+
+        return new GeneralMatrixF(3, 3, scaledDValues); //inverse kinematics
+
+    }
+
     public VectorF PID(VectorF targetPose, double currentTime){
 
         error = localizer.getPoseError(targetPose);
-        double dtime = currentTime - lastTime; // final minus initial
-        lastTime = currentTime;
+        //double dtime = currentTime - lastTime; // final minus initial
+        //lastTime = currentTime;
 
-        dError = localizer.getVel().multiplied(-1); // technically it should be vel of targetPose minus robot vel, but we assume targetPose is const for now.
-        iError.add(error.multiplied((float) dtime));
+        dError = localizer.getVel(); // technically it should be robot vel minus vel of targetPose, but we assume targetPose is const for now.
+        //iError.add(error.multiplied((float) dtime));
 
-        if(Math.abs(error.get(0)) < 0.01){ // integral wipe
-            iError.put(0, 0);
+        /*if(Math.abs(error.get(0)) < 0.01){ // integral wipe
+            iError.put(0, (float)0);
         }
         if(Math.abs(error.get(1)) < 0.01){
-            iError.put(1, 0);
+            iError.put(1, (float)0);
         }
         if(Math.abs(error.get(2))*Math.sqrt((L*L)+(W*W)) < 0.01){
-            iError.put(2, 0);
-        }
+            iError.put(2, (float)0);
+        }*/
 
         VectorF P = kPmat.multiplied(error);
-        VectorF I = kImat.multiplied(iError);
-        VectorF D = kDmat.multiplied(dError);
+        //VectorF I = kImat.multiplied(iError);
+        VectorF D = kDmat.multiplied(getScaledDMat(error).multiplied(dError)); //might need to swap error and dError
 
-        return P.added(I).added(D).multiplied(-1); //idk if this is the right spot
+        return P.added(D).multiplied(-1);
+        //return P.added(I).added(D).multiplied(-1); //idk if this is the right spot
+
+    }
+
+    public VectorF PID(VectorF targetPose, VectorF targetVel, double currentTime){
+
+        error = localizer.getPoseError(targetPose);
+        //double dtime = currentTime - lastTime; // final minus initial
+        //lastTime = currentTime;
+
+        dError = localizer.getVel().subtracted(targetVel); // technically it should be robot vel minus vel of targetPose, but we assume targetPose is const for now.
+        //iError.add(error.multiplied((float) dtime));
+
+        /*if(Math.abs(error.get(0)) < 0.01){ // integral wipe
+            iError.put(0, (float)0);
+        }
+        if(Math.abs(error.get(1)) < 0.01){
+            iError.put(1, (float)0);
+        }
+        if(Math.abs(error.get(2))*Math.sqrt((L*L)+(W*W)) < 0.01){
+            iError.put(2, (float)0);
+        }*/
+
+        VectorF P = kPmat.multiplied(error);
+        //VectorF I = kImat.multiplied(iError);
+        VectorF D = kDmat.multiplied(getScaledDMat(error).multiplied(dError)); //might need to swap error and dError
+
+        return P.added(D).multiplied(-1);
+        //return P.added(I).added(D).multiplied(-1); //idk if this is the right spot for the minus sign
 
     }
 
