@@ -91,7 +91,7 @@ public class MecanumRobotController2 extends RobotController{
 
     }
 
-    public void setTargetState(VectorF targetPose, VectorF targetDerivative, double currentTime){ //this is super messed up; fix it later
+    public void setTargetState(VectorF targetPose, VectorF targetDerivative, double currentTime){ //need to add targetDerivative to the velocity output
 
         setTargetVelocity(rotate(PID(targetPose, currentTime), -localizer.getHeading()));
 
