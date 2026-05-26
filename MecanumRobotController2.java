@@ -93,7 +93,10 @@ public class MecanumRobotController2 extends RobotController{
 
     public void setTargetState(VectorF targetPose, VectorF targetDerivative, double currentTime){ //need to add targetDerivative to the velocity output
 
-        setTargetVelocity(rotate(PID(targetPose, currentTime), -localizer.getHeading()));
+        //setTargetVelocity(rotate(PID(targetPose, currentTime), -localizer.getHeading()));
+        setTargetVelocity(rotate(PID(targetPose, targetDerivative, currentTime), -localizer.getHeading()));
+        //setTargetVelocity(rotate(PID(targetPose, currentTime).added(targetDerivative), -localizer.getHeading()));
+        // i think the third line should be correct but for some reason the targetDerivative term is way too strong. The first line works though
 
     }
 

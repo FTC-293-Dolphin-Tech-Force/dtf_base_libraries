@@ -45,7 +45,7 @@ public class Spline extends Path{
 
     public double getdx(double t){
         double value = 0;
-        for(int i = 0; i < degree[0]-1; i++){
+        for(int i = 0; i < degree[0]; i++){
             value *= t;
             value += ((degree[0]-i)*(X[degree[0]-i]));
         }
@@ -54,7 +54,7 @@ public class Spline extends Path{
 
     public double getdy(double t){
         double value = 0;
-        for(int i = 0; i < degree[1]-1; i++){
+        for(int i = 0; i < degree[1]; i++){
             value *= t;
             value += ((degree[1]-i)*(Y[degree[1]-i]));
         }
@@ -63,7 +63,7 @@ public class Spline extends Path{
 
     public double getdh(double t){
         double value = 0;
-        for(int i = 0; i < degree[2]-1; i++){
+        for(int i = 0; i < degree[2]; i++){
             value *= t;
             value += ((degree[2]-i)*(H[degree[2]-i]));
         }

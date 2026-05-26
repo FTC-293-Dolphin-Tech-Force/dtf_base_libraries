@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.dtf_base_libraries;
 
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+
 public class Path {
 
     Path(){
@@ -18,6 +20,12 @@ public class Path {
         return 0;
     }
 
+    public VectorF getPose(double t){
+
+        return new VectorF((float)getx(t), (float)gety(t), (float)geth(t));
+
+    }
+
     public double getdx(double t){
         return 0;
     }
@@ -28,6 +36,12 @@ public class Path {
 
     public double getdh(double t){
         return 0;
+    }
+
+    public VectorF getDerivative(double t){
+
+        return new VectorF((float)getdx(t), (float)getdy(t), (float)getdh(t));
+
     }
 
 }
