@@ -8,10 +8,10 @@ public class SegmentedPath extends Path{
 
     ArrayList<Segment> segments;
     int N;
-    ArrayList<Double> startTimes;
-    ArrayList<Double> endTimes;
+    ArrayList<Double> startTimes = new ArrayList<Double>();
+    ArrayList<Double> endTimes = new ArrayList<Double>();
     int index = 0; //if index = 2k, we are on segment k. If index = 2k+1, we are between segments k and k+1. if index = -1, we are waiting to start segment 0.
-    SegmentedPath(ArrayList<Segment> _segments){
+    public SegmentedPath(ArrayList<Segment> _segments){
 
         segments = _segments;
         N = segments.size();

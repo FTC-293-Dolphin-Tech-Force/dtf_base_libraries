@@ -5,12 +5,12 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 public class Segment extends Path{
 
     Path path;
-    double startTime;
-    double endTime;
-    VectorF startPose;
-    VectorF startDerivative;
-    VectorF endPose;
-    VectorF endDerivative;
+    double startTime = 0;
+    double endTime = 0;
+    VectorF startPose = new VectorF(0, 0, 0);
+    VectorF startDerivative = new VectorF(0, 0, 0);
+    VectorF endPose = new VectorF(0, 0, 0);
+    VectorF endDerivative = new VectorF(0, 0, 0);
     Segment(Path _path, double _startTime, double _endTime, VectorF _startPose, VectorF _startDerivative, VectorF _endPose, VectorF _endDerivative) {
 
         path = _path;
@@ -22,7 +22,7 @@ public class Segment extends Path{
         endDerivative = _endDerivative;
 
     }
-    Segment(Path _path, double _startTime, double _endTime) {
+    public Segment(Path _path, double _startTime, double _endTime) {
 
         path = _path;
         startTime = _startTime;
