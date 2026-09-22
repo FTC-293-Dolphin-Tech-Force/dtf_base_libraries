@@ -1,73 +1,83 @@
 package org.firstinspires.ftc.teamcode.dtf_base_libraries;
 
-public class Spline extends Path{
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 
-    int[] degree;
+public class Spline extends Path {
+
     double[] X;
     double[] Y;
     double[] H;
 
-    public Spline(double[] _X, double[] _Y, double[] _H){
+    double duration;
 
+
+    public Spline(
+            double[] _X,
+            double[] _Y,
+            double[] _H,
+            double _duration
+    ) {
         X = _X;
         Y = _Y;
         H = _H;
-        degree = new int[]{X.length-1, Y.length-1, H.length-1};
-
+        duration = _duration;
     }
 
-    public double getx(double t){
+
+    private double evaluate(double[] coefficients, double t) {
+
         double value = 0;
-        for(int i = 0; i < degree[0]+1; i++){
+
+        for (int i = coefficients.length - 1; i >= 0; i--) {
             value *= t;
-            value += X[degree[0]-i];
+            value += coefficients[i];
         }
+
         return value;
     }
 
-    public double gety(double t){
+
+    private double evaluateDerivative(double[] coefficients, double t) {
+
         double value = 0;
-        for(int i = 0; i < degree[1]+1; i++){
+
+        //Polynomial derivatives are easy
+        //A + Bt + Ctt ... becomes:
+        //B + 2Ct + 3Dtt ...
+
+        for (int i = coefficients.length - 1; i >= 1; i--) {
             value *= t;
-            value += Y[degree[1]-i];
+            value += i * coefficients[i];
         }
+
         return value;
     }
 
-    public double geth(double t){
-        double value = 0;
-        for(int i = 0; i < degree[2]+1; i++){
-            value *= t;
-            value += H[degree[2]-i];
-        }
-        return value;
+
+    @Override
+    public VectorF getPosition(double t) {
+
+        return new VectorF(
+                (float)evaluate(X, t),
+                (float)evaluate(Y, t),
+                (float)evaluate(H, t)
+        );
     }
 
-    public double getdx(double t){
-        double value = 0;
-        for(int i = 0; i < degree[0]; i++){
-            value *= t;
-            value += ((degree[0]-i)*(X[degree[0]-i]));
-        }
-        return value;
+
+    @Override
+    public VectorF getVelocity(double t) {
+
+        return new VectorF(
+                (float)evaluateDerivative(X, t),
+                (float)evaluateDerivative(Y, t),
+                (float)evaluateDerivative(H, t)
+        );
     }
 
-    public double getdy(double t){
-        double value = 0;
-        for(int i = 0; i < degree[1]; i++){
-            value *= t;
-            value += ((degree[1]-i)*(Y[degree[1]-i]));
-        }
-        return value;
-    }
 
-    public double getdh(double t){
-        double value = 0;
-        for(int i = 0; i < degree[2]; i++){
-            value *= t;
-            value += ((degree[2]-i)*(H[degree[2]-i]));
-        }
-        return value;
+    @Override
+    public double getDuration() {
+        return duration;
     }
-
 }

@@ -52,11 +52,11 @@ public class RobotController {
 
         for(int i = 0; i < n; i++) {
             motors[i] = hardwareMap.get(DcMotorEx.class, hardwareNames[i]);
-            reversedList = _reversedList;
             PIDList[i] = _PIDList[i];
             countsPerRevList[i] = _countsPerRevList[i];
         }
 
+        reversedList = _reversedList;
         for(int i = 0; i < n; i++){
             setUpMotor(motors[i], reversedList[i], PIDList[i]);
         }

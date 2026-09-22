@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.dtf_base_libraries;
 
-public class Arc extends Path{
+public class Arc implements Path {
 
     int[] degree;
     double[] X;

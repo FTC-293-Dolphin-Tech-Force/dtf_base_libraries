@@ -2,46 +2,12 @@ package org.firstinspires.ftc.teamcode.dtf_base_libraries;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 
-public class Path {
+public abstract class Path {
 
-    Path(){
+    public abstract VectorF getPosition(double t);
 
-    }
+    public abstract VectorF getVelocity(double t);
 
-    public double getx(double t){
-        return 0;
-    }
-
-    public double gety(double t){
-        return 0;
-    }
-
-    public double geth(double t){
-        return 0;
-    }
-
-    public VectorF getPose(double t){
-
-        return new VectorF((float)getx(t), (float)gety(t), (float)geth(t));
-
-    }
-
-    public double getdx(double t){
-        return 0;
-    }
-
-    public double getdy(double t){
-        return 0;
-    }
-
-    public double getdh(double t){
-        return 0;
-    }
-
-    public VectorF getDerivative(double t){
-
-        return new VectorF((float)getdx(t), (float)getdy(t), (float)getdh(t));
-
-    }
+    public abstract double getDuration();
 
 }
