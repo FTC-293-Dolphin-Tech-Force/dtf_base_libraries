@@ -4,34 +4,51 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 
 import java.util.ArrayList;
 
-public class SegmentedPath extends Path {
+public class SegmentedPath extends Segment {
 
-    private final ArrayList<Segment> segments;
+    private ArrayList<Segment> segments;
 
-    private final ArrayList<Double> startTimes = new ArrayList<>();
-    private final ArrayList<Double> endTimes = new ArrayList<>();
+    private ArrayList<Double> startTimes = new ArrayList<>();
+    private ArrayList<Double> endTimes = new ArrayList<>();
 
-    private final int N;
+    private int N;
 
 
     public SegmentedPath(ArrayList<Segment> _segments) {
 
+        super(0);
         if (_segments == null || _segments.isEmpty()) {throw new IllegalArgumentException("SegmentedPath cannot have zero Segments.");
         }
 
         segments = _segments;
         N = segments.size();
 
-        double currentTime = 0;
-
         for (Segment segment : segments) {
-
-            startTimes.add(currentTime);
-
-            currentTime += segment.getDuration();
-
-            endTimes.add(currentTime);
+            startTimes.add(duration); //TODO: Combine startTimes with endTimes since it's redundant
+            duration += segment.getDuration();
+            endTimes.add(duration);
         }
+    }
+
+    public SegmentedPath(Segment segment) { //literally just a wrapper for the Segment class,
+
+        super(segment.getDuration());
+        segments.add(segment);
+        N = 1;
+        startTimes.add(duration); //TODO: Combine startTimes with endTimes since it's redundant
+        duration += segment.getDuration();
+        endTimes.add(duration);
+
+    }
+
+    public void add(Segment segment){ //I can maybe overload this method to take both a segment and an index
+
+        segments.add(segment);
+        N++;
+        startTimes.add(duration); //TODO: Combine startTimes with endTimes since it's redundant
+        duration += segment.getDuration();
+        endTimes.add(duration);
+
     }
 
 

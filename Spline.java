@@ -2,13 +2,11 @@ package org.firstinspires.ftc.teamcode.dtf_base_libraries;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 
-public class Spline extends Path {
+public class Spline extends Segment {
 
     double[] X;
     double[] Y;
     double[] H;
-
-    double duration;
 
 
     public Spline(
@@ -17,10 +15,10 @@ public class Spline extends Path {
             double[] _H,
             double _duration
     ) {
+        super(_duration);
         X = _X;
         Y = _Y;
         H = _H;
-        duration = _duration;
     }
 
 
@@ -57,17 +55,21 @@ public class Spline extends Path {
     @Override
     public VectorF getPosition(double t) {
 
+        //minmax to make sure t is within the bounds of the Segment
+        t = Math.min(duration, Math.max(t, 0));
         return new VectorF(
                 (float)evaluate(X, t),
                 (float)evaluate(Y, t),
                 (float)evaluate(H, t)
-        );
+        ).added(origin);
     }
 
 
     @Override
     public VectorF getVelocity(double t) {
 
+        //minmax to make sure t is within the bounds of the Segment
+        t = Math.min(duration, Math.max(t, 0));
         return new VectorF(
                 (float)evaluateDerivative(X, t),
                 (float)evaluateDerivative(Y, t),
@@ -75,9 +77,4 @@ public class Spline extends Path {
         );
     }
 
-
-    @Override
-    public double getDuration() {
-        return duration;
-    }
 }

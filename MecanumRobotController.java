@@ -100,13 +100,13 @@ public class MecanumRobotController extends RobotController{
 
     }
 
-    public void followPath(Path path, double currentTime, double initialTime){
+    public void followPath(Segment path, double currentTime, double initialTime){
 
         double t = currentTime-initialTime;
         setTargetState(path.getPosition(t), path.getVelocity(t), t);
 
     }
-    public void followPath(Path path, double t){
+    public void followPath(Segment path, double t){
 
         setTargetState(path.getPosition(t), path.getVelocity(t), t);
 

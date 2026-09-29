@@ -2,45 +2,34 @@ package org.firstinspires.ftc.teamcode.dtf_base_libraries;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 
-public class Segment extends Path {
+public abstract class Segment {
 
-    private final Path path;
-    private final double duration;
+    protected double duration;
 
+    protected VectorF origin = new VectorF(0, 0); //the 2d origin of the reference frame. This is added to the output of getPosition.
 
-    public Segment(Path _path, double _duration) {
-
-        if (_path == null) {throw new IllegalArgumentException("Null segment detected");}
-
-        path = _path;
+    public Segment(double _duration) {
         duration = Math.abs(_duration);
-
     }
 
+    public abstract VectorF getPosition(double t);
 
-    @Override
-    public VectorF getPosition(double t) {
+    public abstract VectorF getVelocity(double t);
 
-        //minmax to make sure t is within the bounds of the Segment
-        t = Math.min(duration, Math.max(t, 0));
-
-        return path.getPosition(t);
-
-    }
-
-
-    @Override
-    public VectorF getVelocity(double t) {
-
-        //minmax to make sure t is within the bounds of the Segment
-        t = Math.min(duration, Math.max(t, 0));
-
-        return path.getVelocity(t);
-    }
-
-
-    @Override
     public double getDuration() {
         return duration;
     }
+
+    public void setOrigin(VectorF newOrigin){
+        origin = newOrigin;
+    }
+
+    public void shiftOrigin(VectorF shift){
+        origin.add(shift);
+    }
+
+    public VectorF getOrigin(){
+        return origin;
+    }
+
 }
