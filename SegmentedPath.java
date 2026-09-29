@@ -51,6 +51,16 @@ public class SegmentedPath extends Segment {
 
     }
 
+    public void join(Segment segment){ //appends a segment but shifts it so that the startPose lines up with the previous endPose
+
+        VectorF difference = getPosition(duration).subtracted(segment.getPosition(0));
+        Segment shiftedSegment = segment.clone();
+        shiftedSegment.shiftOrigin(difference);
+
+        add(shiftedSegment);
+
+    }
+
 
     private int getSegmentIndex(double t) {
 
