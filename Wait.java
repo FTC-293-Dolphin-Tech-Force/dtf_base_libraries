@@ -12,7 +12,7 @@ public class Wait extends Behavior{
 
     @Override
     void onUpdate(RobotController robot, double currentTime) {
-        robot.setTargetState
+        robot.setTargetState();
     }
 
     @Override
