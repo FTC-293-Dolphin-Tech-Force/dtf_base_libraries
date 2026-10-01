@@ -37,6 +37,9 @@ public class RobotController {
 
     Localizer localizer;
 
+    VectorF targetPose = new VectorF(0, 0, 0);
+    VectorF targetVel = new VectorF(0, 0, 0);
+
 
     RobotController(int _n, HardwareMap hardwareMap, ElapsedTime _runtime, String[] hardwareNames, boolean[] _reversedList, PIDFCoefficients[] _PIDList, int[] _countsPerRevList, double _dt, Localizer _localizer){
 
@@ -121,12 +124,35 @@ public class RobotController {
 
     }
 
-    public void setTargetVelocity(){
+
+
+    public void setTargetVelocity(VectorF _targetVel){
+        targetVel = _targetVel;
+    }
+
+    public void setTargetPosition(VectorF _targetPose){
+        targetPose = _targetPose;
+    }
+
+    //copied this from MecanumRobotController to work with the Behaviour manager
+    public void setTargetState(VectorF targetPose, VectorF targetDerivative, double currentTime){ //need to add targetDerivative to the velocity output
+
+        this.targetPose = targetPose;
+        //setTargetVelocity(rotate(PID(targetPose, currentTime), -localizer.getHeading()));
+        setTargetVelocity(rotate(PID(targetPose, targetDerivative, currentTime), -localizer.getHeading()));
+        //setTargetVelocity(rotate(PID(targetPose, currentTime).added(targetDerivative), -localizer.getHeading()));
+        // i think the third line should be correct but for some reason the targetDerivative term is way too strong. The first line works though
 
     }
 
-    public void setTargetPosition(){
 
+
+    public VectorF getTargetVel(){
+        return targetVel;
+    }
+
+    public VectorF getTargetPose(){
+        return targetPose;
     }
 
 }

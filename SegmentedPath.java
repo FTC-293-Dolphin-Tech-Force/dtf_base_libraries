@@ -17,8 +17,8 @@ public class SegmentedPath extends Segment {
     public SegmentedPath(ArrayList<Segment> _segments) {
 
         super(0);
-        if (_segments == null || _segments.isEmpty()) {throw new IllegalArgumentException("SegmentedPath cannot have zero Segments.");
-        }
+
+        if (_segments == null || _segments.isEmpty()) {throw new IllegalArgumentException("SegmentedPath cannot have zero Segments.");}
 
         segments = _segments;
         N = segments.size();
@@ -28,6 +28,14 @@ public class SegmentedPath extends Segment {
             duration += segment.getDuration();
             endTimes.add(duration);
         }
+    }
+
+    public SegmentedPath(){
+
+        super(0);
+        segments = new ArrayList<Segment>();
+        N = 0;
+
     }
 
     public SegmentedPath(Segment segment) { //literally just a wrapper for the Segment class,
@@ -55,7 +63,7 @@ public class SegmentedPath extends Segment {
 
         VectorF difference = getPosition(duration).subtracted(segment.getPosition(0));
         Segment shiftedSegment = segment.clone();
-        shiftedSegment.shiftOrigin(difference);
+        shiftedSegment.shiftOrigin(new VectorF(difference.get(0), difference.get(1))); //TODO: this is so messy
 
         add(shiftedSegment);
 

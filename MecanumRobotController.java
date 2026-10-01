@@ -9,6 +9,11 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class MecanumRobotController extends RobotController{
+    VectorF smoothTargetPose = new VectorF(0, 0, 0); //TODO: this has to do with the smoothed pid
+    VectorF smoothTargetVel = new VectorF(0, 0, 0); //TODO: this has to do with the smoothed pid
+    float smoothingConstant = 0.5F; //0 means no smoothing, 1 means so smooth its actually bad
+    //ElapsedTime runtime;
+    double time = 0, lastTime = 0;
 
     float L;
     float W;
@@ -17,8 +22,6 @@ public class MecanumRobotController extends RobotController{
     MatrixF iKmat; //inverse kinematics matrix
 
     VectorF error = new VectorF(0, 0, 0), iError = new VectorF(0, 0, 0), dError = new VectorF(0, 0, 0);
-    ElapsedTime runtime;
-    double time = 0, lastTime = 0;
     float kP = (float) 0.60, kI = (float) 0.0, kD = (float) 0.12; //P = 0.105 I = 0.0036 D = 0.037
     float[] kPmatValues = new float[]{
         kP, 0, 0,
@@ -57,6 +60,7 @@ public class MecanumRobotController extends RobotController{
         };
 
         iKmat = new GeneralMatrixF(4, 3, iKmatValues); //inverse kinematics
+
     }
 
     public VectorF iK(VectorF velocities){ //inverse kinematics; vx, vy, ωz -> ω0, ω1, ω2, ω3
@@ -65,6 +69,7 @@ public class MecanumRobotController extends RobotController{
 
     public void setTargetVelocity(VectorF velocity){
 
+        targetVel = velocity;
         VectorF angularVels = iK(velocity);
         for(int i = 0; i < 4; i++){
 
@@ -87,12 +92,17 @@ public class MecanumRobotController extends RobotController{
 
     public void setTargetPosition(VectorF targetPose, double currentTime){ //this is super messed up; fix it later
 
+        this.targetPose = targetPose;
         setTargetVelocity(rotate(PID(targetPose, currentTime), -localizer.getHeading()));
 
     }
 
+
+
+    //might not need this anymore bc its part of the superclass
     public void setTargetState(VectorF targetPose, VectorF targetDerivative, double currentTime){ //need to add targetDerivative to the velocity output
 
+        this.targetPose = targetPose;
         //setTargetVelocity(rotate(PID(targetPose, currentTime), -localizer.getHeading()));
         setTargetVelocity(rotate(PID(targetPose, targetDerivative, currentTime), -localizer.getHeading()));
         //setTargetVelocity(rotate(PID(targetPose, currentTime).added(targetDerivative), -localizer.getHeading()));
@@ -100,13 +110,13 @@ public class MecanumRobotController extends RobotController{
 
     }
 
-    public void followPath(Segment path, double currentTime, double initialTime){
+    public void followPath(Segment path, double currentTime, double initialTime){ //TODO: the BehaviorManager should be handling this, not the MecanumRobotController
 
         double t = currentTime-initialTime;
         setTargetState(path.getPosition(t), path.getVelocity(t), t);
 
     }
-    public void followPath(Segment path, double t){
+    public void followPath(Segment path, double t){  //TODO: the BehaviorManager should be handling this, not the MecanumRobotController
 
         setTargetState(path.getPosition(t), path.getVelocity(t), t);
 
@@ -176,11 +186,17 @@ public class MecanumRobotController extends RobotController{
 
     public VectorF PID(VectorF targetPose, VectorF targetVel, double currentTime){
 
-        error = localizer.getPoseError(targetPose);
-        //double dtime = currentTime - lastTime; // final minus initial
-        //lastTime = currentTime;
+        float dtime = (float)(currentTime - lastTime); // final minus initial
+        lastTime = currentTime;
 
-        dError = localizer.getVel().subtracted(targetVel); // technically it should be robot vel minus vel of targetPose, but we assume targetPose is const for now.
+        //exponential smoothing
+        //TODO: make sure this is actually good vv
+        smoothTargetPose = smoothTargetPose.multiplied(smoothingConstant*dtime).added(targetPose.multiplied(1-smoothingConstant*dtime));
+        smoothTargetVel = smoothTargetVel.multiplied(smoothingConstant*dtime).added(targetVel.multiplied(1-smoothingConstant*dtime));
+
+        error = localizer.getPoseError(smoothTargetPose);
+
+        dError = localizer.getVel().subtracted(smoothTargetVel); // technically it should be robot vel minus vel of targetPose, but we assume targetPose is const for now.
         //iError.add(error.multiplied((float) dtime));
 
         /*if(Math.abs(error.get(0)) < 0.01){ // integral wipe

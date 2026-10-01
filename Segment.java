@@ -20,6 +20,10 @@ public abstract class Segment implements Cloneable {
         return duration;
     }
 
+    public VectorF getEndPose(){ //TODO: check where this method could replace some redundancy
+        return getPosition(duration);
+    }
+
     public void setOrigin(VectorF newOrigin){
         origin = newOrigin;
     }

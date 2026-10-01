@@ -58,10 +58,10 @@ public class Spline extends Segment {
         //minmax to make sure t is within the bounds of the Segment
         t = Math.min(duration, Math.max(t, 0));
         return new VectorF(
-                (float)evaluate(X, t),
-                (float)evaluate(Y, t),
+                (float)evaluate(X, t)+origin.get(0),
+                (float)evaluate(Y, t)+origin.get(1),
                 (float)evaluate(H, t)
-        ).added(origin);
+        );
     }
 
 
