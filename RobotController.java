@@ -145,6 +145,9 @@ public class RobotController {
 
     }
 
+    private VectorF PID(VectorF targetPose, VectorF targetDerivative, double currentTime) {
+        return new VectorF(0, 0, 0);
+    }
 
 
     public VectorF getTargetVel(){
